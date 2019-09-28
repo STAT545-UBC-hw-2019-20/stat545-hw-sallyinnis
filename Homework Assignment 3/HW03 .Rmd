@@ -1,0 +1,66 @@
+---
+title: 'cm006: `dplyr` Exercise'
+output:
+    html_document:
+      keep_md: true
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+library(gapminder)
+library(tidyverse)
+library(dplyr)
+```
+
+# For each task chosen: 
+Produce
+a tibble, using dplyr as your data manipulation tool;
+an accompanying plot of data from the tibble, using ggplot2 as your visualization tool; and
+some dialogue about what your tables/figures show (doesn’t have to be much).
+
+```{r}
+as.data.frame(gapminder)
+```
+
+# TASK 2
+## Get the maximum and minimum of GDP per capita for all continents.
+
+```{r}
+gapgdp = gapminder %>% 
+  group_by(continent) %>% 
+  summarize(min_GDP = min(gdpPercap),
+            max_GDP = max(gdpPercap))
+```
+
+
+# TASK 5
+## How is life expectancy changing over time on different continents?
+
+```{r}
+gapminder %>% 
+  group_by(year, continent) %>% 
+  summarize(meanlife = mean(lifeExp)) %>% 
+  arrange(continent) %>% 
+  ggplot(aes(year, meanlife, colour = continent)) +
+    geom_point() +
+    geom_smooth(method = lm, se = FALSE) +
+    xlab('Year') +
+    ylab('Mean Life Expectancy')
+```
+
+# TASK 6
+## Looking at population recovery in countries post genocide: Rwanda, Cambodia compared one country without.
+
+```{r}
+gapminder %>% 
+  filter(country == 'Rwanda' | country == 'Cambodia' | country == 'Canada') %>% 
+  group_by(country) %>% 
+  arrange(country, year) %>% 
+  mutate(pct_change = ((lifeExp/lag(lifeExp) - 1) * 100)) %>% 
+    ggplot(aes(year, pct_change, colour = country)) +
+    geom_line() +
+    xlab('Year') +
+    ylab('Percent Change in Life Expectancy')
+```
+
