@@ -1,11 +1,17 @@
 ---
 title: 'cm006: `dplyr` Exercise'
 output:
-    html_document:
-      keep_md: true
-editor_options: 
+  html_document:
+    keep_md: yes
+  pdf_document: default
+editor_options:
   chunk_output_type: inline
 ---
+
+```{r allow errors, echo = FALSE}
+knitr::opts_chunk$set(error = TRUE)
+```
+
 
 ```{r}
 library(gapminder)
@@ -13,6 +19,8 @@ library(tidyverse)
 library(dplyr)
 library(DT)
 ```
+
+
 
 # For each task chosen we need to produce: 
 # A tibble, a graph and an explanation of data
@@ -31,14 +39,14 @@ task2 = gapminder %>%
 
 ```{r}
 task2 %>%
-    gather(var, Dollars, -continent)%>%
-    ggplot(aes(x = continent, y = Dollars, fill = var)) +
+    gather(var, GDP, -continent)%>%
+    ggplot(aes(x = continent, y = GDP, fill = var)) +
     geom_col(position = position_dodge()) +
     xlab('Continent')+
     ylab('GDP')
 ```
 
-    
+#### From 1952 - 2007, Asia has the largest GDP and Afria has the smallest GDP. The difference between max and min GDPs in Asia is significantly larges for Asia than for all other continents.
 
 # TASK 5
 ## How is life expectancy changing over time on different continents?
@@ -60,7 +68,7 @@ task5 = gapminder %>%
     ylab('Mean Life Expectancy')
 ```
 
-### There has been a general increase in life expectancy in all continents. Asia has had the largest increase in mean life expectancy from 1952 - 2007.
+### There has been a overall increase in life expectancy in all continents. Asia has had the largest increase in mean life expectancy from 1952 - 2007. Oceania and Europe have experienced a similar rise in life expectancy. Oceania has the highest life expectancy out of all continents. 
 
 # TASK 6
 ## Looking at population recovery in countries post genocide: Rwanda, Cambodia compared one country without.
@@ -79,4 +87,4 @@ task6 = gapminder %>%
     xlab('Year') +
     ylab('Percent Change in Life Expectancy')
 ```
-### Population recovery post genocide displays the same trend in both Cambodia and Rwanda
+### Population recovery post genocide displays the same trend in both Cambodia and Rwanda. Canada shows that the percent change in life expectancy in countries that have not experienced genocide is flat. 
