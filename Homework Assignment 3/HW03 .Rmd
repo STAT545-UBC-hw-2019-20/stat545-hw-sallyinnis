@@ -12,7 +12,6 @@ library(gapminder)
 library(tidyverse)
 library(dplyr)
 library(DT)
-library(reshape2)
 ```
 
 # For each task chosen we need to produce: 
@@ -30,6 +29,16 @@ task2 = gapminder %>%
   
 ```
 
+```{r}
+task2 %>%
+    gather(var, Dollars, -continent)%>%
+    ggplot(aes(x = continent, y = Dollars, fill = var)) +
+    geom_col(position = position_dodge()) +
+    xlab('Continent')+
+    ylab('GDP')
+```
+
+    
 
 # TASK 5
 ## How is life expectancy changing over time on different continents?
@@ -41,6 +50,7 @@ task5 = gapminder %>%
   arrange(continent)
   as_tibble(task5)
 ```
+
 
 ```{r}
   ggplot(task5, aes(year, meanlife, colour = continent)) +
