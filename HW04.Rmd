@@ -1,0 +1,92 @@
+---
+title: "Homework 4"
+output: 
+  html_document:
+    keep_md: yes
+  pdf_document: default
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+```
+
+<!---The following chunk allows errors when knitting--->
+
+```{r allow errors, echo = FALSE}
+knitr::opts_chunk$set(error = TRUE, warning = FALSE)
+```
+
+#Tasks :
+1. Putting data in wider format;
+    - Did you produce the correct result?
+    - Code quality
+2. Producing a plot of the wide data; (10%)
+    - Did you produce a sensible visualization?
+    -  Code quality
+3. Re-lengthening the wider data. (10%)
+    - Did you produce the correct result?
+    - Code quality
+   
+```{r}
+gapminder
+```
+
+
+## Exercise 1: 
+#### Univariate Option 1
+
+#### Make a tibble with one row per year, and columns for life expectancy for two or more countries.
+```{r}
+(exer1 = gapminder %>% 
+  filter(country == "Canada" | country == "China" | country == "Angola") %>% 
+     pivot_wider(id_cols = c(year), 
+              names_from = country, 
+              values_from = lifeExp))
+ 
+```
+
+#### Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
+
+```{r}
+exer1 %>% 
+  ggplot(aes(year, Angola, colour = "Angola")) +
+    geom_point( ) +
+    geom_point(aes(year, Canada, colour = "Canada"))+
+    geom_point(aes(year, China, colour = "China")) +
+    xlab('Year') +
+    ylab('Life Expectancy')
+    title('Life Expectancy in Canada, Angola and China from 1952 - 2007')
+```
+
+#### Re-lengthen the data.
+
+```{r}
+exer1 %>%  
+  pivot_longer(cols = Angola:China, 
+               names_to  = "Country", 
+               values_to = "Life Expectancy")
+```
+
+#Exercise 2: Multivariate Data Reshaping
+
+### Make a tibble with one row per year, and columns for life expectancy and GDP per capita (or two other numeric variables) for two or more countries
+
+#### Putting data in wider format;
+```{r}
+(exer2 = gapminder %>% 
+  filter(country == 'Canada' | country == 'China' | country == 'Senegal') %>% 
+  pivot_wider(id_cols = c(year),
+              names_from = c(country),
+              names_sep = "_",
+              values_from = c(lifeExp,gdpPercap)))
+              
+```
+
+#### Re-lengthening the data
+
+
+
