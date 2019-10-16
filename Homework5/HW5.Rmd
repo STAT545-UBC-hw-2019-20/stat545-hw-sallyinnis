@@ -1,0 +1,177 @@
+---
+title: "Homework 5"
+author: "Sally Innis(34393119)"
+output:
+  pdf_document: default
+  html_document:
+    keep_md: no
+    theme: paper
+---
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(gapminder)
+library(forcats)
+```
+
+
+## Exercise 1
+**The value of the "here" package?**
+  - Using the here::here package overrides the default behaivour of .R files that make the default working directory the top level of the project file. The here package lets you specify what level of the project file you are working in. A;sp, Here() let's you see where you are working. The package allows for easier file sharing between users because it specifies file locations therefore helps reproducibility.
+
+
+```{r}
+library(here)
+here()
+```
+
+## Exercise 2
+**Choose one dataset to explore by:**
+I have chosen Gapminder as the dataset and country as the factor
+
+**Then explore the effects by 1) Comparing the results of arrange on the original and re-leveled factor and 2) Plotting a figure of before/after re-leveling the factor.**
+
+Exploration of Factor: 
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+gapminder$country %>%
+  str()
+nrow(gapminder)
+nlevels(gapminder$country) 
+as_tibble(levels(gapminder$country))
+```
+Remove Observations associated with Oceania:
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+newgapminder <- gapminder %>% 
+  filter(continent != "Oceania")
+nlevels(newgapminder$country)
+nrow(newgapminder)
+nooceaniagapminder <- newgapminder %>% 
+  droplevels()
+nlevels(nooceaniagapminder$country) 
+as_tibble(levels(nooceaniagapminder$country))
+```
+There are 2 less countries included in the evaluation of gapminder countries due to the dropping of Oceania as a continent. 
+
+## 2.Reorder levels based on knowledge from data.
+
+### Below is the unordered plot of gapminder # of continents in 2002, as seen the plot has listed the continents in alphabetical order. 
+```{r}
+gapminder%>% 
+  filter(year == 2002) %>% 
+  ggplot() +
+  geom_bar(aes(continent)) +
+  coord_flip() +
+  theme_bw() +
+  ylab("Number of entries") + xlab("Continent")
+```
+
+#### I have chosen to reorder the gapminder dataset to display the continents in the order of maximum GDP in 2002 with Europe having the highest GDP at the top of the graph and Africa with the lowest GDP at the bottom. 
+```{r}
+gapminder %>% 
+  filter(year == 2002) %>% 
+  ggplot(aes(fct_reorder(continent, gdpPercap, max))) + 
+  geom_bar() +
+  coord_flip()+
+  xlab("Count") + ylab("Continent Ordered by max GDP") +
+  theme_light()
+  
+```
+
+### Exploration of forcats package:
+#####  Fct_lump "lumps" all other continents together except for the numbers specified by n. 
+```{r}
+gapminder %>% 
+  filter(year == 2002) %>% 
+  ggplot(aes(fct_lump(continent, n = 1))) + 
+  geom_bar() +
+  coord_flip()+
+  xlab("Continent") + ylab("Count") +
+  theme_light()
+```
+
+
+## Exercise 3: File input/output
+
+**1) Export a grouped dataset to .csv**
+```{r}
+as_tibble(groupedgapminder <- gapminder %>% 
+  group_by(country) %>% 
+  summarize(Min_lifeExp = min(lifeExp), Min_gdpPercap = min(gdpPercap)))
+  write_csv(groupedgapminder,here::here("Homework5","groupedgapminder.csv"))
+```
+
+**2) With the imported data, play around with factor levels and use factors to order your data with one of your factors (i.e. non-alphabetically). For the I/O method(s) you chose, comment on whether or not your newly created file survived the round trip of writing to file then reading back in.**
+
+I ordered countries by minimun life expectancy. The file "survived the round trip of writing to file and reading back in. 
+```{r}
+readgapminder <- read_csv(here::here("Homework5","groupedgapminder.csv"))
+readgapminder %>% 
+  arrange(fct_reorder(country,Min_lifeExp, min))
+```
+
+## Exercise 4
+
+### For this exercise I took my original scatter plot from homework 4 and I tried to plot this as an percentage area plot. It was a suggested graph from the data to viz site. After I did this it was very clear to me that this graph did not fit the message the graphics should display. I think my original plot did a better job, however, I think the best change I could make to the graph is to simply change the graph from a scatter plot to a line graph. Also my legend is mislabeled as colour instead of country. I also added titles. 
+```{r}
+lifeExpdata = gapminder %>% 
+  filter(country == "Canada" | country == "China" | country == "Angola") %>% 
+     pivot_wider(id_cols = c(year), 
+              names_from = country, 
+              values_from = lifeExp)
+
+lifeExpdata %>% 
+  ggplot(aes(year, Angola, colour = "Angola")) +
+    geom_point( ) +
+    geom_point(aes(year, Canada, colour = "Canada"))+
+    geom_point(aes(year, China, colour = "China")) +
+    xlab('Year') +
+    ylab('Life Expectancy') + #add title 
+    ggtitle("Original Scatter Plot from Homework 4")
+```
+
+
+```{r}
+(newgap = gapminder %>% 
+  filter(country == "Canada" | country == "China" | country == "Angola") %>% 
+  group_by(year, country) %>% 
+  summarise(n = sum(lifeExp)) %>% 
+  mutate(percentage = n/sum(n))) %>% 
+  ggplot(aes(year, percentage, fill = country)) +
+  geom_area(alpha=0.6 , size=1, colour="black") +
+   ggtitle("Updated graph from Homework 4 using percent area calculations") +
+    ylab('Comparative percentage of life expectancy') +
+    xlab('Year')
+  
+```
+
+```{r}
+(updatedgapminder = gapminder %>% 
+  filter(country == "Canada" | country == "China" | country == "Angola") %>% 
+  ggplot(aes(year, lifeExp, colour = country)) +
+    geom_line() +
+    xlab('Year') +
+    ylab('Life Expectancy') +
+    ggtitle('Updated Homework 4 graph:
+            Life Expectancy over time in Angola, Canada and China') +
+    theme_bw())
+  
+```
+
+
+### Exercise 5 
+**Save the last plot displayed.**
+
+```{r}
+updatedgapminder = gapminder %>% 
+  filter(country == "Canada" | country == "China" | country == "Angola") %>% 
+  ggplot(aes(year, lifeExp, colour = country)) +
+    geom_line() +
+    xlab('Year') +
+    ylab('Life Expectancy') +
+    ggtitle('Updated Homework 4 graph:
+            Life Expectancy over time in Angola, Canada and China') +
+    theme_bw()
+ggsave("updatedgapminderplot.png")
+```
+
+![Loaded and Embedded Exercise 5 file](/Users/sallyinnis/Documents/Term%201%202019/R%20Coding%20Course/stat545-hw-sallyinnis/Homework5/updatedgapminderplot.png)
