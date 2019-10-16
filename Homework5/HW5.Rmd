@@ -2,10 +2,10 @@
 title: "Homework 5"
 author: "Sally Innis(34393119)"
 output:
-  pdf_document: default
   html_document:
     keep_md: no
     theme: paper
+  pdf_document: default
 ---
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
